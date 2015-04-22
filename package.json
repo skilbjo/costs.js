@@ -10,13 +10,10 @@
   "engines": {
     "node": "0.10.33"
   },
-  "scripts": {
-    "start": "nodemon server.js" 
-    , "run": "nodemon server.js"
-  },
   "dependencies": {
-    "mysql": "latest"
-    , "underscore": "latest"
+    "mysql": "latest",
+    "underscore": "latest",
+    "csv": "latest"
   },
   "devDependencies": {
     "nodemon": "1.2.1" 

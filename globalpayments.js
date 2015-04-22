@@ -1,38 +1,64 @@
-var mysql      = require('mysql'),
-	connection = mysql.createConnection({
+var fs 					= require('fs'),
+	connection 		= require('mysql').createConnection({
 	  host     : 'localhost',
 	  user     : 'root',
 	  database : 'costs'
 	}),
-	testquery = 'select 1 + 1 as solution'
+	csv 					= require('csv'),
+	inCSV 				= './data/GlobalPayments/february.csv',
+	rl 						= require('readline').createInterface({
+		input	: fs.createReadStream(inCSV),
+		output: process.stdout
+	}),
+	values 				= []
 	;
 
 connection.connect();
 
-var sql = 'insert into GlobalPayments' +
-	'(Month, Txn_Count, Currency, Txn_Amount, Network, ' +
-	'Region, Geographical_Location, Card_Type, Interchange, ' +
-	'Assessments, Service_Charge values ?';
-
-// var values = [
-//     ['demian', 'demian@gmail.com', 1],
-//     ['john', 'john@gmail.com', 2],
-//     ['mark', 'mark@gmail.com', 3],
-//     ['pete', 'pete@gmail.com', 4]
-// ];
-
-connection.query(sql, function(err, rows, fields) {
-  if (err) throw err;
-  console.log('Data has been inserted !');
+rl.on('line', function(line) {
+	parseLine(line);
 });
 
-connection.end();
+var parseLine = function(line){
+	csv.parse(line, function(err, data){
+		var data 	= data[0],
+			result 								= [],
+			Auto_Increment 				= null,
+			Month 								= data[0],
+			Txn_Count 						= data[2],
+			Currency 							= data[3],
+			Txn_Amount 						= data[4],
+			Network 							= data[6],
+			Region 								= data[9],
+			Interchange 					= data[13],
+			Geographical_Location = data[16],
+			Card_Type 						= data[18],
+			Assessments 					= data[20],
+			Service_Charge 				= data[21],
+			Total_Fees 						= data[22]
+			;
 
-// var PresetData = [taskInfo.presetList.length];
-// for( var i = 0; i < taskInfo.presetList.length; i++){
-//    PresetData[i] = [ taskInfo.presetList[i].Name, "" + taskInfo.presetList[i].Category, "" + taskInfo.presetList[i].GUID ];
-// }
+		result.push(Auto_Increment, Month, Txn_Count, Currency, Txn_Amount, Network, 
+			Region, Interchange, Geographical_Location, Card_Type, 
+			Assessments, Service_Charge, Total_Fees);
 
-// console.log("PresetData: " + JSON.stringify(PresetData));
-// this.connection.query( "INSERT INTO Preset (PresetName, PresetCategory, PresetGUID) VALUES ?", [PresetData], function(err, result) {
-// });
+		values.push(result);
+	});
+};
+
+rl.on('close', function() {
+	insert();
+});
+
+var sql = 'insert into GlobalPayments' +
+	'(idGlobalPayments, Month, Txn_Count, Currency, Txn_Amount, Network, ' +
+	'Region, Geographical_Location, Card_Type, Interchange, ' +
+	'Assessments, Service_Charge, Total_Fees) values ?';
+
+var insert = function() {
+	connection.query(sql, [values], function(err, rows, fields) {
+	  if (err) throw err;
+	  console.log('Data has been inserted !');
+	  connection.end();
+	});
+};
