@@ -2,7 +2,7 @@ var fs 					= require('fs'),
 	path 					= require('path'),
 	csv 					= require('csv'),
 	dirPath 			= './../data/Paymentech/csv',
-	csvFile 			= 'salem2015.csv',
+	csvFile 			= 'Homeaway Salem.csv',
 	inCSV 				= path.join(dirPath, csvFile),
 	inCSV_Stream 	= fs.createReadStream(inCSV).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
@@ -12,12 +12,12 @@ var fs 					= require('fs'),
 	  user     : 'root',
 	  database : 'Costs'
 	}),
-	table 			= 'Paymentech'
+	table 			= 'Homeaway'
 	;
 
 var parseIntP = function (number) {
-	var regex = /^\$?\(?[\d,\.]*\)?$/;
-
+	var regex = /^\$?\(?[\d,\.]*\)?$/;;
+	
 		if ( number.match(regex) ) {
 			// console.log('match', number, parseFloat('-' + number.replace(/[\(\)]/g,'').replace(/,/g,"") ) );
 			return parseFloat('-' + number.replace(/[\(\)]/g,'').replace(/,/g,"") );

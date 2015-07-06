@@ -36,6 +36,47 @@ CREATE TABLE IF NOT EXISTS `Costs`.`GlobalPayments` (
   `Total_Fees` FLOAT NOT NULL,
   PRIMARY KEY (`idGlobalPayments`))
 ENGINE = InnoDB
+AUTO_INCREMENT = 76489
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `Costs`.`Homeaway`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Costs`.`Homeaway` (
+  `idHomeaway` INT(11) NOT NULL AUTO_INCREMENT,
+  `Month` DATE NOT NULL,
+  `Fee_Description` VARCHAR(45) NOT NULL,
+  `Transaction_Type` VARCHAR(45) NOT NULL,
+  `Qualification_Code` VARCHAR(60) NOT NULL,
+  `Card_Type` VARCHAR(45) NOT NULL,
+  `Network` VARCHAR(45) NOT NULL,
+  `Txn_Count` VARCHAR(45) NOT NULL,
+  `Txn_Amount` VARCHAR(45) NOT NULL,
+  `Interchange` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idHomeaway`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 8223
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `Costs`.`Paymentech`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Costs`.`Paymentech` (
+  `idPaymentech` INT(11) NOT NULL AUTO_INCREMENT,
+  `Month` DATE NOT NULL,
+  `Fee_Description` VARCHAR(45) NOT NULL,
+  `Transaction_Type` VARCHAR(45) NOT NULL,
+  `Qualification_Code` VARCHAR(60) NOT NULL,
+  `Card_Type` VARCHAR(45) NOT NULL,
+  `Network` VARCHAR(45) NOT NULL,
+  `Txn_Count` VARCHAR(45) NOT NULL,
+  `Txn_Amount` VARCHAR(45) NOT NULL,
+  `Interchange` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idPaymentech`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 8223
 DEFAULT CHARACTER SET = utf8;
 
 
