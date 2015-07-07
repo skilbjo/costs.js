@@ -2,7 +2,7 @@ var fs 					= require('fs'),
 	path 					= require('path'),
 	csv 					= require('csv'),
 	dirPath 			= './../data/Paymentech/csv',
-	csvFile 			= 'salem2015.csv',
+	csvFile 			= 'Salem Cogs 2015.csv',
 	inCSV 				= path.join(dirPath, csvFile),
 	inCSV_Stream 	= fs.createReadStream(inCSV).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
@@ -95,7 +95,7 @@ var transform = function() {
 };
 
 var sql = 'insert into ' + table +
-	'(idHomeaway, Month, Fee_Description, Transaction_Type, Qualification_Code, Card_Type, ' +
+	'(idPaymentech, Month, Fee_Description, Transaction_Type, Qualification_Code, Card_Type, ' +
 	'Network, Txn_Count, Txn_Amount, Interchange) values ?';
 
 var SQLinsert = function(record) {
