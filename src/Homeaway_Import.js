@@ -1,8 +1,8 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
 	csv 					= require('csv'),
-	dirPath 			= './../data/Paymentech/csv',
-	csvFile 			= 'Homeaway Salem.csv',
+	dirPath 			= './../data/Homeaway/csv',
+	csvFile 			= 'salem-ha-jun2015.csv',
 	inCSV 				= path.join(dirPath, csvFile),
 	inCSV_Stream 	= fs.createReadStream(inCSV).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
@@ -16,7 +16,7 @@ var fs 					= require('fs'),
 	;
 
 var parseIntP = function (number) {
-	var regex = /^\$?\(?[\d,\.]*\)?$/;;
+	var regex = /^\$?\(?[\d,\.]*\)?$/;
 	
 		if ( number.match(regex) ) {
 			// console.log('match', number, parseFloat('-' + number.replace(/[\(\)]/g,'').replace(/,/g,"") ) );
