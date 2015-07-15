@@ -8,51 +8,42 @@ var fs 					= require('fs'),
 	inTXT 				= path.join(dirPath, txtFile),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
+	Merchant_Id 	= 4445,
 	parse = true, imprt = false, stream = false, 
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	});
 
-var parseIntP = function (number) { var regex = /^\$?\(?[\d,\.]*\)?$/;
-	if ( number.match(regex) ) { return parseFloat('-' + number.replace(/[\(\)]/g,'').replace(/,/g,"") ); }
-	else{ if (typeof number === "string") { return parseFloat(number.replace(/,/g,"")); } else { return parseFloat(number); } }
-};
-
 if (parse) {
 	rl.on('line', function(line) {
+		tagMerchantId(line);
 
-		if( isValidLine(line) ) parseLine(line);
-
+		if( isValidLine(line) ) { 
+			parseLine(line);
+		}
 	});
 }
 
 var isValidLine = function(line) {
 	var lineitems 				= line.split(''), 
+		subTotalRegex				= /INTCH\/OTHER FEES/,
 		Qualification_Code 	= parse(lineitems, 21, 66),
-		Txn_Count 					= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
-		Merchant_Id 				= isMerchantId(line)
+		Txn_Count 					= parseInt(parse(lineitems, 67, 78).replace(/,/,''))
 	;
 
-	if ( Qualification_Code === '' || isNaN(Txn_Count) || !isMerchantId  ) {
+	if ( Qualification_Code === '' || isNaN(Txn_Count) || subTotalRegex.test(Qualification_Code)  ) {
 		return false;
 	} else {
 		return true;
 	}
 };
 
-var isMerchantId = function(line) {
+var tagMerchantId = function(line) {
 	var lineitems 				= line.split(''),
-		regex = /^4445[0-9]$/,
-		Merchant_Id 				= parse(lineitems, 97, 110);
+		regex 							= /^4445[0-9]+$/,
+		maybeMerchant_Id 		= parse(lineitems, 97, 110);
 
-		console.log(Merchant_Id);
-
-
-	if ( regex.test(Merchant_Id) ) {
-		console.log(Merchant_Id);
-		return true;
-	}
-
+	if ( regex.test(maybeMerchant_Id) ) { Merchant_Id = maybeMerchant_Id; }
 };
 
 var parse = function(line, start, finish) {
@@ -74,15 +65,20 @@ var parseLine = function(line) {
 		Qualification_Code 		= parse(lineitems, 21, 66),
 		Txn_Count 						= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
 		Txn_Amount 						= parseFloat(parse(lineitems, 80, 97).replace(/,/,'')).toFixed(2),
-		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2),
-		Merchant_Id 					= isMerchantId(line)
+		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2)
 	;
 
-	result.push(Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
-
+	result.push(Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
 	// console.log(result);
 
-	return result;
+	var string = "";
+	result.forEach(function(element){
+	    string += element+ '\t';
+	});
+
+	console.log(string);
+	
+	return insert.push(result);
 };
 
 
