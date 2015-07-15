@@ -46,6 +46,10 @@ var tagMerchantId = function(line) {
 	if ( regex.test(maybeMerchant_Id) ) { Merchant_Id = maybeMerchant_Id; }
 };
 
+var isNegative = function(chr){
+	return chr === '-' ? true : false;	
+};
+
 var parse = function(line, start, finish) {
 	var tempArray = []
 		,	parsed = [];
@@ -63,10 +67,16 @@ var parseLine = function(line) {
 		result = [],
 		Auto_Increment 				= null,
 		Qualification_Code 		= parse(lineitems, 21, 66),
-		Txn_Count 						= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
-		Txn_Amount 						= parseFloat(parse(lineitems, 80, 97).replace(/,/,'')).toFixed(2),
+		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
+		Txn_Amount 						= parse(lineitems, 80, 97), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
 		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2)
 	;
+
+	Txn_Count 	= isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
+	Txn_Amount 	= isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
+	Interchange = isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
+
+	// console.log(Interchange);
 
 	result.push(Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
 	// console.log(result);
