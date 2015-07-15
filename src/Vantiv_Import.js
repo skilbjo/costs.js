@@ -9,10 +9,17 @@ var fs 					= require('fs'),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445,
-	parse = true, imprt = false, stream = false, 
+	parse = true, imprt = true, stream = false, 
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
-	});
+	}),
+	connection 		= require('mysql').createConnection({
+	  host     : 'localhost',
+	  user     : 'root',
+	  database : 'Costs'
+	}),
+	table 				= 'Vantiv'
+	;
 
 if (parse) {
 	rl.on('line', function(line) {
@@ -21,6 +28,13 @@ if (parse) {
 		if( isValidLine(line) ) { 
 			parseLine(line);
 		}
+	});
+}
+
+if (imprt) {
+	rl.on('close', function() {
+		connection.connect();
+		SQLinsert(insert);
 	});
 }
 
@@ -78,7 +92,7 @@ var parseLine = function(line) {
 
 	// console.log(Interchange);
 
-	result.push(Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
+	result.push(Auto_Increment, Month, Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
 	// console.log(result);
 
 	var string = "";
@@ -86,88 +100,15 @@ var parseLine = function(line) {
 	    string += element+ '\t';
 	});
 
-	console.log(string);
+	// console.log(string);
 	
 	return insert.push(result);
 };
 
 
-// if (parse) 
-// { 
-// 	inTXT_Stream.on('end', function() {
-// 		csv.parse(data, {auto_parse: true, trim: true}, function(err, data){
-// 			values.push(data);
-// 			transform();
-// 		});
-// 	});
-// }
-
-
-
-
-
-
-var transform = function() {
-	var parsedData = 	values[0];
-	// console.log(parsedData[2]);
-
-	parsedData.filter(function(item, iterator){
-		/* skip headers */ 
-		if (iterator === 0) { return false; } else { return true; }
-	})
-	.filter(function(item) {
-		/* only import interchange */
-		if (item[2] === 'Interchange') 
-		{ return true; } else { return false; }
-	}).map(function(item, iterator){
-		var result 							= [],
-			Auto_Increment 				= null,
-			Month 								= item[0], 
-			Fee_Description 			= item[2], 
-			Transaction_Type 			= item[3], 
-			Qualification_Code 		= item[12],
-			Card_Type 						= item[13],
-			Network 							= item[4],
-			Txn_Count 						= item[7],
-			Txn_Amount 						= item[9],
-			Interchange 					= item[11];
-
-		if (typeof Txn_Count === 'string') 		Txn_Count 	= parseFloat(Txn_Count.replace(/,/g,""));
-		if (typeof Txn_Amount === 'string') 	Txn_Amount 	= parseIntP(Txn_Amount);
-		if (typeof Interchange === 'string') 	Interchange = parseIntP(Interchange);
-
-		result.push(Auto_Increment, Month, Fee_Description, Transaction_Type, Qualification_Code, Card_Type, Network, Txn_Count, Txn_Amount, Interchange);
-
-		// if ( isNaN( Interchange ) ) console.log( Month, Qualification_Code, Card_Type );
-
-		return insert.push(result);
-
-	});
-
-
-	if (imprt) SQLinsert(insert);
-};
-
-
-
-
-
-
-
-
-var	connection 		= require('mysql').createConnection({
-	  host     : 'localhost',
-	  user     : 'root',
-	  database : 'Costs'
-	}),
-	table 			= 'Vantiv'
-	;
-
-if (imprt) connection.connect();
-
 var sql = 'insert into ' + table +
-	'(idVantiv, Month, Fee_Description, Transaction_Type, Qualification_Code, Card_Type, ' +
-	'Network, Txn_Count, Txn_Amount, Interchange) values ?';
+	'(idVantiv, Month, Merchant_Id, Qualification_Code, Txn_Count, Txn_Amount, ' +
+	'Interchange) values ?';
 
 var SQLinsert = function(record) {
 	connection.query(sql, [record], function(err, rows, fields) {
