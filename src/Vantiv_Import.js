@@ -1,6 +1,5 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
-	csv 					= require('csv'),
 	dirPath 			= './../data/Vantiv/txt',
 	txtFile 			= 'Vantiv-June2015.txt',
 	MonthNumber 	= '06',
@@ -9,7 +8,7 @@ var fs 					= require('fs'),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445,
-	parse = true, imprt = true, stream = false, 
+	parse = true, imprt = false, stream = false, 
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	}),
@@ -45,11 +44,32 @@ var isValidLine = function(line) {
 		Txn_Count 					= parseInt(parse(lineitems, 67, 78).replace(/,/,''))
 	;
 
-	if ( Qualification_Code === '' || isNaN(Txn_Count) || subTotalRegex.test(Qualification_Code)  ) {
+	if ( Qualification_Code === '' || isNaN(Txn_Count) || subTotalRegex.test(Qualification_Code) || isSummaryTable(line)  ) {
 		return false;
 	} else {
 		return true;
 	}
+};
+
+var isSummaryTable = function(line) {
+	var lineitems 				= line.split(''),
+		divRegex 						= /^\*\*DIVISION SUMMARY\*\*$/,
+		chainRegex 					= /^\*\*CHAIN SUMMARY\*\*$/,
+		divSummary 					= parse(lineitems, 88, 108),
+		chainSummary 				= parse(lineitems, 88, 105)
+		;
+
+	if ( divRegex.test(divSummary) || chainRegex.test(chainSummary) ) {
+		Merchant_Id = 'SummaryTable';
+		console.log('hit!');
+	} 
+ 
+ 	if ( divRegex.test(divSummary) ) {
+ 		console.log('hit!!!');
+ 	}
+
+	return Merchant_Id === 'SummaryTable' ? true : false;
+
 };
 
 var tagMerchantId = function(line) {
