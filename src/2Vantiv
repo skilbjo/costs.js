@@ -8,7 +8,7 @@ var fs 					= require('fs'),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445,
-	parse = true, imprt = true, stream = false, 
+	parse = true, imprt = false, stream = false, 
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	}),
@@ -43,27 +43,13 @@ var isValidLine = function(line) {
 		Txn_Count 					= parseInt(parse(lineitems, 67, 78).replace(/,/,''))
 	;
 
-	if ( merchantFilter() || isSummaryTable(line) || notTabularData(line) || isNaN(Txn_Count) || isSubtotal(line)  ) {
+	// if (isSummaryTable)
+
+	if ( isSummaryTable(line) || Qualification_Code === '' || isNaN(Txn_Count) || isSubtotal(line)   ) {
 		return false;
 	} else {
 		return true;
 	}
-};
-
-var merchantFilter = function() {
-	var desiredMerchant = '4445017773648';
-
-	return false;
-
-	// return desiredMerchant === Merchant_Id ? false : true;
-};
-
-var notTabularData = function(line) {
-	var lineitems					= line.split(''),
-		Qualification_Code 	= parse(lineitems, 21, 66)
-	;
-
-	return Qualification_Code === '' ? true : false;
 };
 
 var isSubtotal = function(line) {
@@ -82,6 +68,8 @@ var isSummaryTable = function(line) {
 		divSummary 					= parse(lineitems, 88, 108),
 		chainSummary 				= parse(lineitems, 88, 105)
 		;
+
+	// console.log(chainSummary);
 
 	if ( divRegex.test(divSummary) || chainRegex.test(chainSummary) ) {
 		Merchant_Id = 'SummaryTable';
@@ -121,7 +109,7 @@ var parseLine = function(line) {
 		Auto_Increment 				= null,
 		Qualification_Code 		= parse(lineitems, 21, 66),
 		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
-		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
+		Txn_Amount 						= parse(lineitems, 80, 97), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
 		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2)
 	;
 
@@ -149,9 +137,7 @@ var sql = 'insert into ' + table +
 var SQLinsert = function(record) {
 	connection.query(sql, [record], function(err, rows, fields) {
 	  if (err) { console.log(rows); throw err; }
-	  console.log([record]);
 	  console.log('Data has been inserted !');
-	  // connection.rollback();
 	  connection.end();
 	});
 };

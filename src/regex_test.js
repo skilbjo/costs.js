@@ -11,14 +11,14 @@ var parse = function(line, start, finish) {
 };
 
 var 
-	lineDiv = '                                                                                        **DIVISION SUMMARY**                      ',
+	lineDiv 						= '                                                                                        **DIVISION SUMMARY**                      ',
 	lineitemsDiv 				= lineDiv.split(''),
-	lineChain = '                                                                                        **CHAIN SUMMARY**                         ',
-	lineitemsChain 				= lineChain.split(''),
-	divRegex 					= /^\*\*DIVISION SUMMARY\*\*$/,
-	chainRegex 				= /^\*\*CHAIN SUMMARY\*\*$/,
-	divSummary 				= parse(lineitemsDiv, 88, 108),
-	chainSummary 			= parse(lineitemsChain, 88, 105)
+	lineChain 					= '                                                                                        **CHAIN SUMMARY**                         ',
+	lineitemsChain 			= lineChain.split(''),
+	divRegex 						= /^\*\*DIVISION SUMMARY\*\*$/,
+	chainRegex 					= /^\*\*CHAIN SUMMARY\*\*$/,
+	divSummary 					= parse(lineitemsDiv, 88, 108),
+	chainSummary 				= parse(lineitemsChain, 88, 105)
 	;
 
 

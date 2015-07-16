@@ -2,13 +2,14 @@ var fs 					= require('fs'),
 	path 					= require('path'),
 	dirPath 			= './../data/Vantiv/txt',
 	txtFile 			= 'Vantiv-June2015.txt',
+	csv = require('csv'),
 	MonthNumber 	= '06',
 	Month 				= '2015'+MonthNumber+'30',
 	inTXT 				= path.join(dirPath, txtFile),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445,
-	parse = true, imprt = true, stream = false, 
+	parse = true, imprt = false, stream = false, 
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	}),
@@ -43,19 +44,17 @@ var isValidLine = function(line) {
 		Txn_Count 					= parseInt(parse(lineitems, 67, 78).replace(/,/,''))
 	;
 
-	if ( merchantFilter() || isSummaryTable(line) || notTabularData(line) || isNaN(Txn_Count) || isSubtotal(line)  ) {
+	if ( !isSubtotal(line)  ) {
 		return false;
 	} else {
 		return true;
 	}
 };
 
-var merchantFilter = function() {
-	var desiredMerchant = '4445017773648';
+var notMerchant = function() {
+	var desiredMerchant = '4445018516955';
 
-	return false;
-
-	// return desiredMerchant === Merchant_Id ? false : true;
+	return desiredMerchant === Merchant_Id ? false : true;
 };
 
 var notTabularData = function(line) {
@@ -68,7 +67,7 @@ var notTabularData = function(line) {
 
 var isSubtotal = function(line) {
 	var lineitems 		= line.split(''),
-		subTotalRegex 	= /INTCH\/OTHER FEES/,
+		subTotalRegex 	= /TOTAL INTCH\/OTHER FEES/,
 		Qualification_Code 	= parse(lineitems, 21, 66)
 	;
 
@@ -121,7 +120,7 @@ var parseLine = function(line) {
 		Auto_Increment 				= null,
 		Qualification_Code 		= parse(lineitems, 21, 66),
 		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
-		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
+		Txn_Amount 						= parse(lineitems, 80, 97), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
 		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2)
 	;
 
@@ -132,8 +131,11 @@ var parseLine = function(line) {
 	result.push(Auto_Increment, Month, Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
 
 	var string = "";
-	result.forEach(function(element){
-	    string += element+ '\t';
+	result.forEach(function(el){
+		string+=el+'\t';
+    // csv.stringify(el, function(err, el){
+    // 	string += el;
+    // });
 	});
 
 	console.log(string);
@@ -149,9 +151,7 @@ var sql = 'insert into ' + table +
 var SQLinsert = function(record) {
 	connection.query(sql, [record], function(err, rows, fields) {
 	  if (err) { console.log(rows); throw err; }
-	  console.log([record]);
 	  console.log('Data has been inserted !');
-	  // connection.rollback();
 	  connection.end();
 	});
 };
