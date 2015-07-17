@@ -1,7 +1,7 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
 	dirPath 			= './../data/Vantiv/txt',
-	txtFile 			= 'Vantiv-June2015.txt',
+	txtFile 			= '2Vantiv.txt',
 	MonthNumber 	= '06',
 	Month 				= '2015'+MonthNumber+'30',
 	inTXT 				= path.join(dirPath, txtFile),
@@ -51,7 +51,7 @@ var isValidLine = function(line) {
 };
 
 var merchantFilter = function() {
-	var desiredMerchant = '4445017773648';
+	var desiredMerchant = '4445015871111';
 
 	return false;
 
@@ -88,7 +88,6 @@ var isSummaryTable = function(line) {
 	} 
 
 	return Merchant_Id === 'SummaryTable' ? true : false;
-
 };
 
 var tagMerchantId = function(line) {
@@ -96,7 +95,9 @@ var tagMerchantId = function(line) {
 		regex 							= /^4445[0-9]+$/,
 		maybeMerchant_Id 		= parse(lineitems, 97, 110);
 
-	if ( regex.test(maybeMerchant_Id) ) { Merchant_Id = maybeMerchant_Id; }
+	if ( regex.test(maybeMerchant_Id) ) { 
+		Merchant_Id = maybeMerchant_Id; 
+	}
 };
 
 var isNegative = function(chr){
@@ -120,9 +121,9 @@ var parseLine = function(line) {
 		result = [],
 		Auto_Increment 				= null,
 		Qualification_Code 		= parse(lineitems, 21, 66),
-		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/,'')),
-		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
-		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/,'')).toFixed(2)
+		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/g,'')),
+		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/g,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
+		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/g,'')).toFixed(2)
 	;
 
 	Txn_Count 	= isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
@@ -149,7 +150,7 @@ var sql = 'insert into ' + table +
 var SQLinsert = function(record) {
 	connection.query(sql, [record], function(err, rows, fields) {
 	  if (err) { console.log(rows); throw err; }
-	  console.log([record]);
+	  // console.log([record]);
 	  console.log('Data has been inserted !');
 	  // connection.rollback();
 	  connection.end();
