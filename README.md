@@ -18,8 +18,6 @@ $ mysql.server start
 
 - ParseInt on Txn_Amount (doesn't work for millions)
 - ParseInt on Interchange
-- Add checker to determine if *Division Summary* or *Chain Summary*
-- if Checker for Summary lines is true, ignore import line
 
 ### Paymentech to-do
 
