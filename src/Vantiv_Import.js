@@ -17,7 +17,7 @@ var fs 					= require('fs'),
 	  user     : 'root',
 	  database : 'Costs'
 	}),
-	table 				= 'Vantiv'
+	table 				= 'Vantiv_test'
 	;
 
 if (parse) {
@@ -100,6 +100,34 @@ var tagMerchantId = function(line) {
 	}
 };
 
+var TransactionType = function(chr) {
+	return !isNegative(chr) ? 'Gross' : 'Refund';
+};
+
+var IssuerType = function(Qualification_Code) {
+	var Intl_Regex = /INTL/gi;
+
+	if ( Intl_Regex.test(Qualification_Code) ) {
+		return 'International';
+	} else {
+		return 'Domestic';
+	}
+
+};
+
+var CardType = function(Qualification_Code) {
+	var Debit = /debit/gi,
+		Prepaid = /prepaid/gi
+		;
+
+	if (Debit.test(Qualification_Code) || Prepaid.test(Qualification_Code) ) {
+		return 'Debit';
+	} else { 
+		return 'Credit';
+	}
+
+};
+
 var isNegative = function(chr){
 	return chr === '-' ? true : false;	
 };
@@ -123,14 +151,17 @@ var parseLine = function(line) {
 		Qualification_Code 		= parse(lineitems, 21, 66),
 		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/g,'')),
 		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/g,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
-		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/g,'')).toFixed(2)
+		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/g,'')).toFixed(2),
+		Transaction_Type 			= TransactionType(lineitems[97]),
+		Issuer_Type 					= IssuerType(Qualification_Code),
+		Card_Type 						= CardType(Qualification_Code)
 	;
 
 	Txn_Count 	= isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
 	Txn_Amount 	= isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
 	Interchange = isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
 
-	result.push(Auto_Increment, Month, Merchant_Id, Qualification_Code,  Txn_Count, Txn_Amount, Interchange );
+	result.push(Auto_Increment, Month, Merchant_Id, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  Txn_Count, Txn_Amount, Interchange );
 
 	var string = "";
 	result.forEach(function(element){
@@ -144,7 +175,8 @@ var parseLine = function(line) {
 
 
 var sql = 'insert into ' + table +
-	'(idVantiv, Month, Merchant_Id, Qualification_Code, Txn_Count, Txn_Amount, ' +
+	'(idVantiv, Month, Merchant_Id, Qualification_Code, Transaction_Type, '+ 
+	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
 	'Interchange) values ?';
 
 var SQLinsert = function(record) {

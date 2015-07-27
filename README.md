@@ -16,8 +16,7 @@ $ mysql.server start
 
 ### Vantiv to-do
 
-- ParseInt on Txn_Amount (doesn't work for millions)
-- ParseInt on Interchange
+- Finished
 
 ### Paymentech to-do
 

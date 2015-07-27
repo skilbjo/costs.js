@@ -1,6 +1,8 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
 	csv 					= require('csv'),
+	MonthNumber 	= '06',
+	Month 				= '2015'+MonthNumber+'30',
 	dirPath 			= './../data/GlobalPayments/csv',
 	csvFile 			= 'March2015.csv',
 	inCSV 				= path.join(dirPath, csvFile),
@@ -11,7 +13,9 @@ var fs 					= require('fs'),
 	  host     : 'localhost',
 	  user     : 'root',
 	  database : 'Costs'
-	});
+	}),
+	table					= 'GlobalPayments'
+	;
 
 /*
 =TEXT(EOMONTH(DATE(2014,4,1),0),"YYYYMMDD")
@@ -72,7 +76,7 @@ var transform = function() {
 	if (imprt) SQLinsert(insert);
 };
 
-var sql = 'insert into GlobalPayments' +
+var sql = 'insert into ' + table + 
 	'(idGlobalPayments, Month, Txn_Count, Currency, Txn_Amount, Network, ' +
 	'Region, Interchange, Geographical_Location, Card_Type, ' +
 	'Assessments, Service_Charge, Total_Fees) values ?';
