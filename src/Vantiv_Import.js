@@ -1,5 +1,6 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
+	h 		 				= require('./helper.js'),
 	dirPath 			= './../data/Vantiv/txt',
 	txtFile 			= '2Vantiv.txt',
 	MonthNumber 	= '06',
@@ -7,8 +8,8 @@ var fs 					= require('fs'),
 	inTXT 				= path.join(dirPath, txtFile),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
-	Merchant_Id 	= 4445,
-	parse = true, imprt = true, stream = false, 
+	Merchant_Id 	= 4445, Merchant_Descriptor = '', 
+	parse = true, imprt = false, filter = false,
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	}),
@@ -23,6 +24,7 @@ var fs 					= require('fs'),
 if (parse) {
 	rl.on('line', function(line) {
 		tagMerchantId(line);
+		tagMerchantDescriptor(line);
 
 		if( isValidLine(line) ) { 
 			parseLine(line);
@@ -53,9 +55,12 @@ var isValidLine = function(line) {
 var merchantFilter = function() {
 	var desiredMerchant = '4445015871111';
 
-	return false;
+	if (filter) {
+		return desiredMerchant === Merchant_Id ? false : true;
+	} else {
+		return false;
+	}
 
-	// return desiredMerchant === Merchant_Id ? false : true;
 };
 
 var notTabularData = function(line) {
@@ -100,37 +105,16 @@ var tagMerchantId = function(line) {
 	}
 };
 
-var TransactionType = function(chr) {
-	return !isNegative(chr) ? 'Gross' : 'Refund';
-};
+var tagMerchantDescriptor = function(line) {
+	var lineitems 								= line.split(''),
+		regex 											= /PAY*/,
+		maybeMerchantDescriptor 		= parse(lineitems, 104, 132).trim();
 
-var IssuerType = function(Qualification_Code) {
-	var Intl_Regex = /INTL/gi;
-
-	if ( Intl_Regex.test(Qualification_Code) ) {
-		return 'International';
-	} else {
-		return 'Domestic';
+	if ( regex.test(maybeMerchantDescriptor) ) { 
+		Merchant_Descriptor = maybeMerchantDescriptor; 
 	}
-
 };
 
-var CardType = function(Qualification_Code) {
-	var Debit = /debit/gi,
-		Prepaid = /prepaid/gi
-		;
-
-	if (Debit.test(Qualification_Code) || Prepaid.test(Qualification_Code) ) {
-		return 'Debit';
-	} else { 
-		return 'Credit';
-	}
-
-};
-
-var isNegative = function(chr){
-	return chr === '-' ? true : false;	
-};
 
 var parse = function(line, start, finish) {
 	var tempArray = []
@@ -152,16 +136,16 @@ var parseLine = function(line) {
 		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/g,'')),
 		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/g,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
 		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/g,'')).toFixed(2),
-		Transaction_Type 			= TransactionType(lineitems[97]),
-		Issuer_Type 					= IssuerType(Qualification_Code),
-		Card_Type 						= CardType(Qualification_Code)
+		Transaction_Type 			= h.TransactionType(lineitems[97]),
+		Issuer_Type 					= h.IssuerType(Qualification_Code),
+		Card_Type 						= h.CardType(Qualification_Code)
 	;
 
-	Txn_Count 	= isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
-	Txn_Amount 	= isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
-	Interchange = isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
+	Txn_Count 	= h.isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
+	Txn_Amount 	= h.isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
+	Interchange = h.isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
 
-	result.push(Auto_Increment, Month, Merchant_Id, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  Txn_Count, Txn_Amount, Interchange );
+	result.push(Auto_Increment, Month, Merchant_Id, Merchant_Descriptor, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  Txn_Count, Txn_Amount, Interchange );
 
 	var string = "";
 	result.forEach(function(element){
