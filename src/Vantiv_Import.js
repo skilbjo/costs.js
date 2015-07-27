@@ -1,6 +1,6 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
-	h 		 				= require('./helper.js'),
+	h 		 				= require('./3. Helper/helper.js'),
 	dirPath 			= './../data/Vantiv/txt',
 	txtFile 			= '2Vantiv.txt',
 	MonthNumber 	= '06',
@@ -9,7 +9,7 @@ var fs 					= require('fs'),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445, Merchant_Descriptor = '', 
-	parse = true, imprt = false, filter = false,
+	parse = true, imprt = true, filter = false,
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
 	}),
@@ -18,7 +18,7 @@ var fs 					= require('fs'),
 	  user     : 'root',
 	  database : 'Costs'
 	}),
-	table 				= 'Vantiv_test'
+	table 				= 'Vantiv'
 	;
 
 if (parse) {
@@ -159,7 +159,7 @@ var parseLine = function(line) {
 
 
 var sql = 'insert into ' + table +
-	'(idVantiv, Month, Merchant_Id, Qualification_Code, Transaction_Type, '+ 
+	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Qualification_Code, Transaction_Type, '+ 
 	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
 	'Interchange) values ?';
 
