@@ -25,7 +25,6 @@ $ mysql.server start
 ````
 cd src/
 vim Vantiv_Import.js
-
 ~~~~
 var 	MonthNumber 	= '06',  /* <-- increment up! */
 ~~~~
@@ -37,18 +36,18 @@ var 	MonthNumber 	= '06',  /* <-- increment up! */
 $ node Vantiv_Import.js
 ````
 
-### Paymentech to-do
+#### Paymentech to-do
 
 - Try to find a non-aggregate file with merchant-level data (currently only supports the single aggregation level file)
 
-### Global Payments to-do
+#### Global Payments to-do
 
-1. Place data in `data/GlobalPayments/csv
-
-#### Database backup to Production server
+1. Place data in `data/GlobalPayments/csv`
 
 
-##### Backup 
+### Maintenance // pushing dev DB to production server
+
+#### Backup 
 
 1. Create a backup from the development machine, either manually or automatically
 
