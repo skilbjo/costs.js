@@ -25,9 +25,10 @@ $ mysql.server start
 ````
 cd src/
 vim Vantiv_Import.js
-''''
+...
 var 	MonthNumber 	= '06',  /* <-- increment up! */
-''''
+...
+:x!
 ````
 
 3. Run the script
@@ -43,7 +44,6 @@ $ node Vantiv_Import.js
 #### Global Payments to-do
 
 1. Place data in `data/GlobalPayments/csv`
-
 
 ### Maintenance // pushing dev DB to production server
 
@@ -67,4 +67,15 @@ $ node Vantiv_Import.js
 4. Restore the production server database from the backup file
 	- windows: `mysql -u root -p costs < Desktop\Costs.sql`
 
+If you get an `Acess is denied.` message, it is probably a corrupt `.sql` file, so try steps 3 and 4 again !
 
+
+#### Tricks
+
+If you get a `ER_MAX_PACKET_TOO_LARGE`,
+
+````
+$ mysql -u root
+mysql> set global max_allowed_packet= 900*1024*1024;
+Query OK, 0 rows affected
+````

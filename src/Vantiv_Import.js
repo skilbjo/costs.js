@@ -1,6 +1,6 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
-	h 		 				= require('./3. Helper/helper.js'),
+	h 						= require('./3. Helper/helper.js'),
 	dirPath 			= './../data/Vantiv/txt',
 	txtFile 			= '2Vantiv.txt',
 	MonthNumber 	= '06',
@@ -9,14 +9,9 @@ var fs 					= require('fs'),
 	inTXT_Stream 	= fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
 	Merchant_Id 	= 4445, Merchant_Descriptor = '', 
-	parse = true, imprt = true, filter = false,
+	parse = true, imprt = false, filter = false,
 	rl 						= require('readline').createInterface({
 		input: inTXT_Stream
-	}),
-	connection 		= require('mysql').createConnection({
-	  host     : 'localhost',
-	  user     : 'root',
-	  database : 'Costs'
 	}),
 	table 				= 'Vantiv'
 	;
@@ -34,7 +29,7 @@ if (parse) {
 
 if (imprt) {
 	rl.on('close', function() {
-		connection.connect();
+		h.connection.connect();
 		SQLinsert(insert);
 	});
 }
@@ -133,6 +128,7 @@ var parseLine = function(line) {
 		result = [],
 		Auto_Increment 				= null,
 		Qualification_Code 		= parse(lineitems, 21, 66),
+		Network 							= h.Network(Qualification_Code),
 		Txn_Count		 					= parseInt(parse(lineitems, 67, 78).replace(/,/g,'')),
 		Txn_Amount 						= parse(lineitems, 80, 97).replace(/,/g,''), //parseFloat(parse(lineitems, 80, 97)) , //.replace(/,/,'')), //.toFixed(2),
 		Interchange 					= parseFloat(parse(lineitems, 99, 111).replace(/,/g,'')).toFixed(2),
@@ -145,7 +141,10 @@ var parseLine = function(line) {
 	Txn_Amount 	= h.isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
 	Interchange = h.isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
 
-	result.push(Auto_Increment, Month, Merchant_Id, Merchant_Descriptor, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  Txn_Count, Txn_Amount, Interchange );
+	result.push(Auto_Increment, Month, Merchant_Id, Merchant_Descriptor, 
+		Network, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  
+		Txn_Count, Txn_Amount, Interchange
+	);
 
 	var string = "";
 	result.forEach(function(element){
@@ -159,17 +158,15 @@ var parseLine = function(line) {
 
 
 var sql = 'insert into ' + table +
-	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Qualification_Code, Transaction_Type, '+ 
+	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
 	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
 	'Interchange) values ?';
 
 var SQLinsert = function(record) {
-	connection.query(sql, [record], function(err, rows, fields) {
+	h.connection.query(sql, [record], function(err, rows, fields) {
 	  if (err) { console.log(rows); throw err; }
-	  // console.log([record]);
 	  console.log('Data has been inserted !');
-	  // connection.rollback();
-	  connection.end();
+	  h.connection.end();
 	});
 };
 

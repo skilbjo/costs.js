@@ -1,17 +1,13 @@
 var fs 					= require('fs'),
 	path 					= require('path'),
 	csv 					= require('csv'),
-	dirPath 			= './../data/Paymentech/excel',
-	csvFile 			= 'junesalem.xlsx',
+	h 						= require('./3. Helper/helper.js'),
+	dirPath 			= './../data/Paymentech/csv',
+	csvFile 			= 'salem-jun2015.csv',
 	inCSV 				= path.join(dirPath, csvFile),
 	inCSV_Stream 	= fs.createReadStream(inCSV).setEncoding('utf-8'),
 	values 				= [], insert = [], data = '', 
-	parse = true, imprt = false,
-	connection 		= require('mysql').createConnection({
-	  host     : 'localhost',
-	  user     : 'root',
-	  database : 'Costs'
-	}),
+	parse = true, imprt = true,
 	table 			= 'Paymentech'
 	;
 
@@ -32,12 +28,7 @@ var parseIntP = function (number) {
 
 };
 
-
-/*
-=TEXT(EOMONTH(DATE(2014,4,1),0),"YYYYMMDD")
-*/
-
-if (imprt) connection.connect();
+if (imprt) h.connection.connect();
 
 if (parse) inCSV_Stream.on('data', function(chunk){ data+=chunk; });
 
@@ -74,13 +65,18 @@ var transform = function() {
 			Network 							= item[4],
 			Txn_Count 						= item[7],
 			Txn_Amount 						= item[9],
-			Interchange 					= item[11];
+			Interchange 					= item[11],
+			Issuer_Type 					= null
+			;
 
 		if (typeof Txn_Count === 'string') 		Txn_Count 	= parseFloat(Txn_Count.replace(/,/g,""));
 		if (typeof Txn_Amount === 'string') 	Txn_Amount 	= parseIntP(Txn_Amount);
 		if (typeof Interchange === 'string') 	Interchange = parseIntP(Interchange);
 
-		result.push(Auto_Increment, Month, Fee_Description, Transaction_Type, Qualification_Code, Card_Type, Network, Txn_Count, Txn_Amount, Interchange);
+		result.push(Auto_Increment, Month, 
+			Network, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type, 
+			Txn_Count, Txn_Amount, Interchange
+		);
 
 		// if ( isNaN( Interchange ) ) console.log( Month, Qualification_Code, Card_Type );
 
@@ -99,10 +95,10 @@ var sql = 'insert into ' + table +
 	'Network, Txn_Count, Txn_Amount, Interchange) values ?';
 
 var SQLinsert = function(record) {
-	connection.query(sql, [record], function(err, rows, fields) {
+	h.connection.query(sql, [record], function(err, rows, fields) {
 	  if (err) { console.log(rows); throw err; }
 	  console.log('Data has been inserted !');
-	  connection.end();
+	  h.connection.end();
 	});
 };
 
