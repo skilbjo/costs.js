@@ -25,9 +25,9 @@ $ mysql.server start
 ````
 cd src/
 vim Vantiv_Import.js
-~~~~
+''''
 var 	MonthNumber 	= '06',  /* <-- increment up! */
-~~~~
+''''
 ````
 
 3. Run the script
