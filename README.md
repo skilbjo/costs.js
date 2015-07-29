@@ -14,9 +14,28 @@ $ npm install
 $ mysql.server start
 ````
 
-### Vantiv to-do
+### Parsers 
 
-- Finished
+#### Vantiv
+
+1. Place data in `data/Vantiv`
+
+2. Change month variable
+
+````
+cd src/
+vim Vantiv_Import.js
+
+~~~~
+var 	MonthNumber 	= '06',  /* <-- increment up! */
+~~~~
+````
+
+3. Run the script
+
+````
+$ node Vantiv_Import.js
+````
 
 ### Paymentech to-do
 
@@ -24,4 +43,29 @@ $ mysql.server start
 
 ### Global Payments to-do
 
-- Not a damn thing! It's done.
+1. Place data in `data/GlobalPayments/csv
+
+#### Database backup to Production server
+
+
+##### Backup 
+
+1. Create a backup from the development machine, either manually or automatically
+
+	- manual: `mysqld -u root -p costs > costs.sql`
+	- automatically: `cd automatation && ./backup.sh`
+
+2. Connect to production server
+	- smb: `open smb://000113-DT/Users/jskilbeck`
+	- ssh: `ssh jskilbeck@0001113-DT`
+
+3. Move the backup file from the development machine to the production server
+	- smb: `mv Costs-27-Jul-2015.sql /Volumes/jskilbeck/Desktop/Costs.sql`
+	- ssh: `/* to do */`
+	- sftp: `/* to do */`
+	- email: `mail.yapstone.com`
+
+4. Restore the production server database from the backup file
+	- windows: `mysql -u root -p costs < Desktop\Costs.sql`
+
+
