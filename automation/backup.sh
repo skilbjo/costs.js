@@ -7,7 +7,7 @@ host="localhost"
 db_name="Costs"
 
 # Other options
-backup_path="/Users/jskilbeck/Code/Node/mysql/db_backup"
+backup_path="/Users/jskilbeck/Code/Node/costsjs/db_backup"
 date=$(date +"%d-%b-%Y")
 
 # Set file permissions

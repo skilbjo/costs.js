@@ -4,11 +4,11 @@ var fs 					= require('fs'),
 	dirPath 			= './../data/Paymentech/excel',
 	MonthNumber 	= '06',
 	Month 				= '2015'+MonthNumber+'30',
-	fileName 			= 'junesalem.xlsx',
+	fileName 			= 'salemjuly.xlsx',
 	file 					= path.join(dirPath, fileName),
-	workbook 			= require('xlsx').readFile(file).Sheets.SlmStmt,
+	workbook 			= require('xlsx').readFile(file).Sheets.Sheet1,
 	parse = true, imprt = false, insert = [],
-	table = 'PS_Test'
+	table = 'Paymentech'
 ;
 
 var sql = 'insert into ' + table +
@@ -30,7 +30,7 @@ var parseXLSX = function(workbook) {
 	data.forEach(function(el) {
 		var 			result = [],
 			Network 							= h.Network(null,el.MOP),
-			Qualification_Code 		= el['Interchange & Assessment Fees'],
+			Qualification_Code 		= el.Description,
 			Transaction_Type 			= el['Action Type'],
 			Issuer_Type 					= h.IssuerType(Qualification_Code),
 			Card_Type							= h.CardType(Qualification_Code),
@@ -39,7 +39,7 @@ var parseXLSX = function(workbook) {
 			Interchange 					= el['Total Charge'] * -1
 		;
 
-		if ( Qualification_Code !== 'Interchange') return;
+		if ( el['Interchange & Assessment Fees'] !== 'Interchange') return;
 
 		result.push(null, Month, Network, Qualification_Code, 
 			Transaction_Type, Issuer_Type, Card_Type,
