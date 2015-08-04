@@ -2,6 +2,6 @@
 
 open smb://000113-DT/Users/jskilbeck
 
-cd /Volumes/jskilbeck
+#cd /Volumes/jskilbeck
 
 

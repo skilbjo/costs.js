@@ -4,10 +4,10 @@ var fs 					= require('fs'),
 	dirPath 			= './../data/Paymentech/excel',
 	MonthNumber 	= '06',
 	Month 				= '2015'+MonthNumber+'30',
-	fileName 			= 'salemjuly.xlsx',
+	fileName 			= 'junesalem.xlsx',
 	file 					= path.join(dirPath, fileName),
 	workbook 			= require('xlsx').readFile(file).Sheets.Sheet1,
-	parse = true, imprt = false, insert = [],
+	parse = true, imprt = true, insert = [],
 	table = 'Paymentech'
 ;
 

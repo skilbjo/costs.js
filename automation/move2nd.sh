@@ -1,8 +1,11 @@
 #!/bin/sh
 
-cd 
+# Variables
+backup_path="/Users/jskilbeck/Code/Node/costsjs/db_backup"
+file=costs.sql.gz
+finance_computer="/Volumes/jskilbeck/Desktop"
 
-mv Costs-27-Jul-2015.sql /Volumes/jskilbeck/Desktop/Costs.sql
+cp $backup_path/$file $finance_computer/$file
 
 
 
