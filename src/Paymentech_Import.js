@@ -2,11 +2,11 @@ var fs 					= require('fs'),
 	path 					= require('path'),
 	h 						= require('./3. Helper/helper.js'),
 	dirPath 			= './../data/Paymentech/excel',
-	MonthNumber 	= '06',
-	Month 				= '2015'+MonthNumber+'30',
-	fileName 			= 'junesalem.xlsx',
+	MonthNumber 	= '08',
+	Month 				= '2015'+MonthNumber+'31',
+	fileName 			= 'SalemAugust.xlsx',
 	file 					= path.join(dirPath, fileName),
-	workbook 			= require('xlsx').readFile(file).Sheets.Sheet1,
+	workbook 			= require('xlsx').readFile(file).Sheets.Paymentech,
 	parse = true, imprt = true, insert = [],
 	table = 'Paymentech'
 ;
@@ -38,6 +38,8 @@ var parseXLSX = function(workbook) {
 			Txn_Amount 						= el.Amount,
 			Interchange 					= el['Total Charge'] * -1
 		;
+
+		// console.log(el['Total Charge'] * -1);
 
 		if ( el['Interchange & Assessment Fees'] !== 'Interchange') return;
 

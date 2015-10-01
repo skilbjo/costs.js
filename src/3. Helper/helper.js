@@ -46,7 +46,7 @@ var TransactionType = function(chr) {
 var IssuerType = function(Qualification_Code) {
 	var Intl_Regex = /INTL/gi,
 		International_Regex = /International/gi,
-		Interregional_Regex = /Interregtional/gi
+		Interregional_Regex = /Interregional/gi
 	;
 
 	if ( Intl_Regex.test(Qualification_Code) || International_Regex.test(Qualification_Code) || Interregional_Regex.test(Qualification_Code) ) {
