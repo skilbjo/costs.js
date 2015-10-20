@@ -1,5 +1,6 @@
 var fs = require('fs'),
 	path = require('path'),
+	async = require('async'),
 	h = require('./3. Helper/helper.js'),
 	dirPath = './../data/Vantiv/txt',
 	txtFile = 'QTCSM00Y_MM-085_09-30-2015.txt',
@@ -9,12 +10,14 @@ var fs = require('fs'),
 	inTXT_Stream = fs.createReadStream(inTXT).setEncoding('utf-8'),
 	values = [], insert = [], data = '', 
 	Merchant_Id = 4445, Merchant_Descriptor = '', 
-	parse = true, imprt = true, filter = false,
+	parse = true, imprt = true, filter = false, showConsole = false,
 	rl = require('readline').createInterface({
 		input: inTXT_Stream
 	}),
 	table = 'Vantiv_test'
 	;
+
+
 
 if (parse) {
 	rl.on('line', function(line) {
@@ -27,12 +30,39 @@ if (parse) {
 	});
 }
 
+var sql = 'insert into ' + table +
+	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
+	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
+	'Interchange) values ?';
+
 if (imprt) {
 	rl.on('close', function() {
 		h.connection.connect();
-		SQLinsert(insert);
-	});
+		parseArray(insert, function(parsed){
+			async.times(parsed.length, function(n, next){
+				var data = parsed[n]; 
+				h.connection.query(sql, [data], function(err,result){
+					next(err, result);
+				});
+			}, function(err){
+				console.log(err);
+			});
+		});
+	})
 }
+
+var parseArray = function(arr, cb){
+	var size = 1000,
+	 parsed = []
+	 ;
+
+	for (var i=0; i<arr.length; i+=size){
+		var chunk = arr.slice(i,i+size);
+		parsed.push(chunk);
+	};
+
+	cb(parsed);
+};
 
 var isValidLine = function(line) {
 	var lineitems = line.split(''), 
@@ -146,35 +176,37 @@ var parseLine = function(line) {
 		Txn_Count, Txn_Amount, Interchange
 	);
 
-	var string = "";
-	result.forEach(function(element){
-	    string += element+ '\t';
-	});
-	// console.log(string);
+	if (showConsole) {
+		var string = "";
+		result.forEach(function(element){
+		    string += element+ '\t';
+		});
+	}
+
+	if (showConsole) {
+		// console.log(string);
+	}
+
 	return insert.push(result);
 };
 
 
-var sql = 'insert into ' + table +
-	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
-	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
-	'Interchange) values ?';
 
-var SQLinsert = function(record) {
-	h.connection.query(sql, [record])
-	.on('error', function(err){
-		console.log('Error: ', err);
-	})
-	.on('fields', function(fields){
-		console.log(fields);
-	})
-	.on('result', function(row){
-		console.log(row);
-	})
-	.on('end', function() {
-		h.connection.end();
-	});
 
-};
+// var SQLinsert = function(record) {
+// 	h.connection.query(sql, [record])
+// 	.on('error', function(err){
+// 		console.log('Error: ', err);
+// 	})
+// 	.on('fields', function(fields){
+// 		console.log(fields);
+// 	})
+// 	.on('result', function(row){
+// 		console.log(row);
+// 	})
+// 	.on('end', function() {
+// 		h.connection.end();
+// 	});
+// };
 
 

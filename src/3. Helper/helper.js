@@ -3,6 +3,7 @@ var fs 				= require('fs'),
 	  host     : 'localhost',
 	  user     : 'root',
 	  database : 'Costs'
+	  // ,multipleStatements: true
 	})
 	;
 
