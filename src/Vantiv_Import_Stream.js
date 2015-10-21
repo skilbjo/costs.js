@@ -39,14 +39,7 @@ if (imprt) {
 	rl.on('close', function() {
 		h.connection.connect();
 		parseArray(insert, function(parsed){
-			async.times(parsed.length, function(n, next){
-				var data = parsed[n]; 
-				h.connection.query(sql, [data], function(err,result){
-					next(err, result);
-				});
-			}, function(err){
-				console.log(err);
-			});
+			SQLinsert(parsed);
 		});
 	})
 }
@@ -63,6 +56,17 @@ var parseArray = function(arr, cb){
 
 	cb(parsed);
 };
+
+var SQLinsert = function(parsed){
+	async.times(parsed.length, function(n, next){
+		var data = parsed[n]; 
+		h.connection.query(sql, [data], function(err,result){
+		next(err, result);
+		});
+	}, function(err){
+		console.log(err);
+	});
+}
 
 var isValidLine = function(line) {
 	var lineitems = line.split(''), 
