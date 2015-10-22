@@ -3,9 +3,53 @@ var fs 				= require('fs'),
 	  host     : 'localhost',
 	  user     : 'root',
 	  database : 'Costs'
-	  // ,multipleStatements: true
 	})
 	;
+
+var parse = function(line, start, finish) {
+	var tempArray = []
+		,	parsed = [];
+
+	for (i = start; i < finish; i++) {
+		tempArray.push(line[i]);
+		parsed = tempArray.join('');
+	}
+	return parsed.trim();
+};
+
+var isSummaryTable = function(line) {
+	var lineitems = line.split(''),
+		Merchant_Id = '',
+		divRegex = /^\*\*DIVISION SUMMARY\*\*$/,
+		chainRegex = /^\*\*CHAIN SUMMARY\*\*$/,
+		divSummary = parse(lineitems, 88, 108),
+		chainSummary = parse(lineitems, 88, 105)
+		;
+
+	if ( divRegex.test(divSummary) || chainRegex.test(chainSummary) ) {
+		Merchant_Id = 'SummaryTable';
+	} 
+
+	return Merchant_Id === 'SummaryTable' ? true : false;
+};
+
+var notTabularData = function(line) {
+	var lineitems					= line.split(''),
+		Qualification_Code 	= parse(lineitems, 21, 66)
+	;
+
+	return Qualification_Code === '' ? true : false;
+};
+
+var isSubtotal = function(line) {
+	var lineitems = line.split(''),
+		subTotalRegex = /INTCH\/OTHER FEES/,
+		Qualification_Code = parse(lineitems, 21, 66)
+	;
+
+	return subTotalRegex.test(Qualification_Code);
+};
+
 
 var isNegative = function(chr){
 	return chr === '-' ? true : false;	
@@ -64,3 +108,10 @@ exports.TransactionType 	= TransactionType;
 exports.IssuerType 				= IssuerType;
 exports.connection 				= connection;
 exports.Network 					= Network;
+exports.isSummaryTable 		= isSummaryTable;
+exports.notTabularData 		= notTabularData;
+exports.isSubtotal 				= isSubtotal;
+exports.parse 						= parse;
+
+
+
