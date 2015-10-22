@@ -16,7 +16,8 @@
     "csv": "0.4.5",
     "xlsx": "0.8.0",
     "exceljs": "0.2.3",
-    "async":  "1.4.2"
+    "async":  "1.4.2",
+    "pg": "4.4.3"
   },
   "devDependencies": {
     "nodemon": "1.2.1" 

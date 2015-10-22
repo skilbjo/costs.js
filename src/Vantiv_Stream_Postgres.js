@@ -106,8 +106,6 @@ var isValidLine = function(line) {
 	}
 };
 
-
-
 var parseLine = function(line) {
 	var lineitems 	= line.split(''),
 		row = [],

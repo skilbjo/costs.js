@@ -3,7 +3,8 @@ var fs 				= require('fs'),
 	  host     : 'localhost',
 	  user     : 'root',
 	  database : 'Costs'
-	})
+	}),
+	psql = require('')
 	;
 
 var parse = function(line, start, finish) {
