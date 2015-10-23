@@ -7,7 +7,7 @@ host="localhost"
 db_name="Costs"
 
 # Other options
-backup_path="/Users/jskilbeck/Code/Node/costsjs/db_backup"
+backup_path="/Users/jskilbeck/Code/Node/costsjs/db_backup/mysql"
 date=$(date +"%d-%b-%Y")
 sql_file=$db_name
 gnu_file=$sql_file.gz

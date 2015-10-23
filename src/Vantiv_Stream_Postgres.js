@@ -77,7 +77,7 @@ var reduceArray = function(arr, cb){
 	for (var i=0; i<arr.length; i+=size){
 		var chunk = arr.slice(i,i+size);
 		small_array.push(chunk);
-	};
+	}
 	cb(small_array);
 };
 
