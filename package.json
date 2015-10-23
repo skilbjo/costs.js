@@ -17,7 +17,8 @@
     "xlsx": "0.8.0",
     "exceljs": "0.2.3",
     "async":  "1.4.2",
-    "pg": "4.4.3"
+    "pg": "4.4.3",
+    "sequelize": "3.12.2"
   },
   "devDependencies": {
     "nodemon": "1.2.1" 

@@ -1,14 +1,15 @@
 var fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
-	h = require('./3. Helper/helper.js'),
+	h = require('./../lib/helper.js'),
 	txtFile = 'QTCSM00Y_MM-085_09-30-2015.txt',
 	MonthNumber 	= '09', Month = '2015'+MonthNumber+'30',
-	inTXT_Stream = fs.createReadStream(path.join('./../data/Vantiv/txt', txtFile)).setEncoding('utf-8'),
+	inTXT_Stream = fs.createReadStream(path.join('./../processor/Vantiv/txt', txtFile)).setEncoding('utf-8'),
 	Merchant_Id = 4445, Merchant_Descriptor = '', large_array = [],
 	imprt = true, filter = false, showConsole = false,
 	rl = require('readline').createInterface({ input: inTXT_Stream }),
-	table = 'Vantiv_test'
+	table = 'Vantiv',
+	psql = require('./../lib/config/database.js')
 	;
 
 /* TO DO... 
@@ -17,10 +18,10 @@ var fs = require('fs'),
 */
 
 /* Globals... SQL statement, merchant filter (testing), MerchantId assignment, MerchnatDescriptor assignment */
-var sql = 'insert into ' + table +
-	'(idVantiv, Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
+var sql = 'insert into '+table+
+	' (Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
 	' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
-	'Interchange) values ?';
+	'Interchange) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)';
 
 var tagMerchantId = function(line) {
 	var lineitems = line.split(''),
@@ -62,7 +63,7 @@ rl.on('line', function(line) {
 });
 
 rl.on('close', function() {
-	h.connection.connect();
+	psql.connect();
 	reduceArray(large_array, function(small_array){
 		db(small_array);
 	});
@@ -82,15 +83,26 @@ var reduceArray = function(arr, cb){
 
 /* Insert into SQL */
 var db = function(small_array){
-	async.times(small_array.length, function(n, next){
-		var data = small_array[n]; 
-		h.connection.query(sql, [data], function(err,result){
-		next(err, result);
+	for(var i = 0; i<small_array.length;i++){
+		var data = small_array[i];
+		data.forEach(function(item,index){
+			psql.query(sql, item, function(err,result){
+				if(err) console.log(err);
+				psql.end();
+			});
 		});
-	}, function(err){
-		console.log(err);
-	});
-}
+	}
+
+
+	// async.times(small_array.length, function(n, next){
+	// 	var data = small_array[n]; 
+	// 		psql.query(sql, [data], function(err,result){
+	// 			next(err, result);
+	// 		});
+	// }, function(err){
+	// 	console.log(err);
+	// });
+};
 
 /* Determine if each line is valid or not */
 var isValidLine = function(line) {
@@ -123,7 +135,7 @@ var parseLine = function(line) {
 	Txn_Amount = h.isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
 	Interchange = h.isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
 
-	row.push(null, Month, Merchant_Id, Merchant_Descriptor, 
+	row.push(Month, Merchant_Id, Merchant_Descriptor, 
 		Network, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  
 		Txn_Count, Txn_Amount, Interchange
 	);

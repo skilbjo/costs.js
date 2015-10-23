@@ -14,6 +14,8 @@ bower_components/
 *.key
 *.txt
 db_backup/
+lib/config/database.js
+processor/
 
 Ignore the stuff in the public directory except for ...
 # public/

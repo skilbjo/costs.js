@@ -1,7 +1,7 @@
 var fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
-	h = require('./3. Helper/helper.js'),
+	h = require('./../lib/helper.js'),
 	txtFile = 'QTCSM00Y_MM-085_09-30-2015.txt',
 	MonthNumber 	= '09', Month = '2015'+MonthNumber+'30',
 	inTXT_Stream = fs.createReadStream(path.join('./../data/Vantiv/txt', txtFile)).setEncoding('utf-8'),
@@ -62,7 +62,7 @@ rl.on('line', function(line) {
 });
 
 rl.on('close', function() {
-	h.connection.connect();
+	h.mysql.connect();
 	reduceArray(large_array, function(small_array){
 		db(small_array);
 	});
@@ -76,7 +76,7 @@ var reduceArray = function(arr, cb){
 	for (var i=0; i<arr.length; i+=size){
 		var chunk = arr.slice(i,i+size);
 		small_array.push(chunk);
-	};
+	}
 	cb(small_array);
 };
 
@@ -84,13 +84,13 @@ var reduceArray = function(arr, cb){
 var db = function(small_array){
 	async.times(small_array.length, function(n, next){
 		var data = small_array[n]; 
-		h.connection.query(sql, [data], function(err,result){
+		h.mysql.query(sql, [data], function(err,result){
 		next(err, result);
 		});
 	}, function(err){
 		console.log(err);
 	});
-}
+};
 
 /* Determine if each line is valid or not */
 var isValidLine = function(line) {

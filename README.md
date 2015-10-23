@@ -105,3 +105,8 @@ query
     // all rows have been received
   });
 ````
+
+#### Start Databases
+
+MySQL: `$ mysql.server start`
+Postgres: `$ postgres -D /usr/local/var/postgres --fork`
