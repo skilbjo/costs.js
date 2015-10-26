@@ -34,7 +34,7 @@ cat $backup_path/$gnu_file | ssh $username@$server "cat > $server_path/$gnu_file
 # GNU unZip
 ssh $username@$server "gzip -df $server_path/$gnu_file"
 
-# mySQL load
-ssh $username@$server "psql $db_name < $server_path/$sql_file"
+# psql load
+ssh $username@$server "psql -U $username $db_name < $server_path/$sql_file"
 
 

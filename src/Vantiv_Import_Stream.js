@@ -2,7 +2,7 @@ var fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
 	h = require('./../lib/helper.js'),
-	file = 'QTCSM00Y_MM-085_08-31-2015.txt',
+	file = 'QTCSM00Y_MM-085_06-30-2015.txt',
 	Month = new Date(file.split('_')[2].replace(/.txt/,'')).toISOString().slice(0,10),
 	stream = fs.createReadStream(path.join('./../processor/Vantiv/txt', file)).setEncoding('utf-8'),
 	Merchant_Id = 4445, Merchant_Descriptor = '', large_array = [],
@@ -135,7 +135,7 @@ var parseLine = function(line) {
 	Txn_Amount = h.isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
 	Interchange = h.isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
 
-	if(Transaction_Type === 'Refund' && Interchange == 'NaN') Interchange = 0;
+	if(Interchange == 'NaN') Interchange = 0;
 
 	row.push(null, Month, Merchant_Id, Merchant_Descriptor, 
 		Network, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  

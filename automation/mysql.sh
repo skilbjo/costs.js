@@ -13,7 +13,7 @@ sql_file=$db_name
 gnu_file=$sql_file.gz
 username="skilbjo"
 server="finance"
-server_path="/home/skilbjo/code/sql/costsjs"
+server_path="/home/skilbjo/code/sql/costsjs/mysql"
 
 # Set file permissions
 umask 177
@@ -22,7 +22,7 @@ umask 177
 mysqldump --user=$user --password=$password --host=$host $db_name > $backup_path/$db_name-$date.sql
 
 # Delete old backups
-find . -name "$backup_path/*.sql" -mtime +45 exec rm {} \;
+# find . -name "$backup_path/*.sql" -mtime +45 exec rm {} \;
 
 # GNU Zip Global
 cp $backup_path/$db_name-$date.sql $backup_path/$sql_file
