@@ -2,19 +2,14 @@ var fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
 	h = require('./../lib/helper.js'),
-	txtFile = 'QTCSM00Y_MM-085_09-30-2015.txt',
-	MonthNumber 	= '09', Month = '2015'+MonthNumber+'30',
-	inTXT_Stream = fs.createReadStream(path.join('./../data/Vantiv/txt', txtFile)).setEncoding('utf-8'),
+	file = 'QTCSM00Y_MM-085_08-31-2015.txt',
+	Month = new Date(file.split('_')[2].replace(/.txt/,'')).toISOString().slice(0,10),
+	stream = fs.createReadStream(path.join('./../processor/Vantiv/txt', file)).setEncoding('utf-8'),
 	Merchant_Id = 4445, Merchant_Descriptor = '', large_array = [],
 	imprt = true, filter = false, showConsole = false,
-	rl = require('readline').createInterface({ input: inTXT_Stream }),
-	table = 'Vantiv_test'
+	rl = require('readline').createInterface({ input: stream }),
+	table = 'Vantiv'
 	;
-
-/* TO DO... 
-	-do error checking (ie any null data elements inserted?
-	-use postgres database
-*/
 
 /* Globals... SQL statement, merchant filter (testing), MerchantId assignment, MerchnatDescriptor assignment */
 var sql = 'insert into ' + table +
@@ -30,6 +25,21 @@ var tagMerchantId = function(line) {
 	if ( regex.test(maybeMerchant_Id) ) { 
 		Merchant_Id = maybeMerchant_Id; 
 	}
+};
+
+var isSummaryTable = function(line) {
+	var lineitems = line.split(''),
+		divRegex = /^\*\*DIVISION SUMMARY\*\*$/,
+		chainRegex = /^\*\*CHAIN SUMMARY\*\*$/,
+		divSummary = h.parse(lineitems, 88, 108),
+		chainSummary = h.parse(lineitems, 88, 105)
+		;
+
+	if ( divRegex.test(divSummary) || chainRegex.test(chainSummary) ) {
+		Merchant_Id = 'SummaryTable';
+	} 
+
+	return Merchant_Id === 'SummaryTable' ? true : false;
 };
 
 var merchantFilter = function() {
@@ -48,6 +58,20 @@ var tagMerchantDescriptor = function(line) {
 
 	if ( regex.test(maybeMerchantDescriptor) ) { 
 		Merchant_Descriptor = maybeMerchantDescriptor; 
+	}
+};
+
+/* Determine if each line is valid or not */
+var isValidLine = function(line) {
+	var lineitems = line.split(''), 
+		Qualification_Code 	= h.parse(lineitems, 21, 66),
+		Txn_Count = parseInt(h.parse(lineitems, 67, 78).replace(/,/,''))
+	;
+
+	if ( merchantFilter() || isSummaryTable(line) || h.notTabularData(line) || isNaN(Txn_Count) || h.isSubtotal(line)  ) {
+		return false;
+	} else {
+		return true;
 	}
 };
 
@@ -85,27 +109,13 @@ var db = function(small_array){
 	async.times(small_array.length, function(n, next){
 		var data = small_array[n]; 
 		h.mysql.query(sql, [data], function(err,result){
-		next(err, result);
+			next(err, result);
 		});
 	}, function(err){
 		console.log(err);
 	});
+	console.log('Done!');
 };
-
-/* Determine if each line is valid or not */
-var isValidLine = function(line) {
-	var lineitems = line.split(''), 
-		Qualification_Code 	= h.parse(lineitems, 21, 66),
-		Txn_Count = parseInt(h.parse(lineitems, 67, 78).replace(/,/,''))
-	;
-
-	if ( merchantFilter() || h.isSummaryTable(line) || h.notTabularData(line) || isNaN(Txn_Count) || h.isSubtotal(line)  ) {
-		return false;
-	} else {
-		return true;
-	}
-};
-
 
 
 var parseLine = function(line) {
@@ -124,6 +134,8 @@ var parseLine = function(line) {
 	Txn_Count = h.isNegative(lineitems[78]) 	?	Txn_Count 		*= -1 : Txn_Count;
 	Txn_Amount = h.isNegative(lineitems[97]) 	?	'-'+Txn_Amount  		: Txn_Amount;
 	Interchange = h.isNegative(lineitems[111])	? '-'+Interchange	 		: Interchange;
+
+	if(Transaction_Type === 'Refund' && Interchange == 'NaN') Interchange = 0;
 
 	row.push(null, Month, Merchant_Id, Merchant_Descriptor, 
 		Network, Qualification_Code, Transaction_Type, Issuer_Type, Card_Type,  
