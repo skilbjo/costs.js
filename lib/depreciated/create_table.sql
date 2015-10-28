@@ -1,18 +1,3 @@
-var 
-	psql = require('./../lib/config/database.js')
-	;
-
-
-psql.connect(function(err){
-	if(err) console.log(err);
-
-	psql.query('select now() as "the time"',function(err,result){
-		if(err) console.log(err);
-		console.log(result.rows);
-		psql.end();
-	});
-});
-
 create table Vantiv (
 	id serial primary key,
 	Month date,
@@ -29,5 +14,18 @@ create table Vantiv (
 );
 
 create table GlobalPayments (
-
+	id serial primary key,
+	Month date,
+	Region varchar(45),
+	Currency varchar(45),
+	Network varchar(45),
+	Qualification_Code varchar(45),
+	Transaction_Type varchar(45),
+	Card_Type varchar(45),
+	Txn_Count integer,
+	Txn_Amount decimal(48,2),
+	Interchange decimal(48,2),
+	Assessments decimal(48,2),
+	Service_Charge decimal(48,2),
+	Total_Fees decimal(48,2)
 );

@@ -13,10 +13,10 @@ var fs = require('fs'),
 	;
 
 /* Globals... SQL statement, merchant filter (testing), MerchantId assignment, MerchnatDescriptor assignment */
-var sql = 'insert into '+table+
-    ' (Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
+var sql = 'insert into '+table+'('+
+    ' Month, Merchant_Id, Merchant_Descriptor, Network, Qualification_Code, Transaction_Type, '+ 
     ' Issuer_Type, Card_Type, Txn_Count, Txn_Amount, ' +
-    'Interchange) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)';
+    ' Interchange) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)';
 
 var tagMerchantId = function(line) {
 	var lineitems = line.split(''),
