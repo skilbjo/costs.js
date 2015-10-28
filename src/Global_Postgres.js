@@ -3,10 +3,10 @@ var fs = require('fs'),
 	csv = require('csv'),
 	h = require('./../lib/helper.js'),
 	psql = require('./../lib/config/database.js'),
-	file = 'Presentment_Interchange_Summary_2015-09-30T194730.csv',
+	file = 'Presentment_Interchange_Summary_2015-06-30T235545.csv',
 	Month = file.split('_')[3].replace(/.csv/,'').slice(0,10),
 	stream 	= fs.createReadStream(path.join('./../processor/GlobalPayments/csv',file)),
-	csv_data = [] , large_array = [], data = '', showConsole = true,
+	csv_data = [] , large_array = [], data = '', showConsole = false,
 	table					= 'GlobalPayments'
 	;
 
