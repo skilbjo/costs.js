@@ -29,3 +29,14 @@ create table GlobalPayments (
 	Service_Charge decimal(48,2),
 	Total_Fees decimal(48,2)
 );
+
+create table Mids (
+	id serial primary key,
+	Platform integer,
+	Vertical varchar(45),
+	ParentAccountId varchar(45),
+	ParentName varchar(45),
+	Processor varchar(45),
+	ProcessorMid varchar(45)
+);
+

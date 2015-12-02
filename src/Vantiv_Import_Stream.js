@@ -2,7 +2,8 @@ var fs = require('fs'),
 	path = require('path'),
 	async = require('async'),
 	h = require('./../lib/helper.js'),
-	file = 'QTCSM00Y_MM-085_06-30-2015.txt',
+	database = require('./../lib/config/database1.js'),
+	file = 'QTCSM00Y_MM-085_10-31-2015.txt',
 	Month = new Date(file.split('_')[2].replace(/.txt/,'')).toISOString().slice(0,10),
 	stream = fs.createReadStream(path.join('./../processor/Vantiv/txt', file)).setEncoding('utf-8'),
 	Merchant_Id = 4445, Merchant_Descriptor = '', large_array = [],
@@ -86,7 +87,7 @@ rl.on('line', function(line) {
 });
 
 rl.on('close', function() {
-	h.mysql.connect();
+	database.mysql.connect();
 	reduceArray(large_array, function(small_array){
 		db(small_array);
 	});
@@ -108,7 +109,7 @@ var reduceArray = function(arr, cb){
 var db = function(small_array){
 	async.times(small_array.length, function(n, next){
 		var data = small_array[n]; 
-		h.mysql.query(sql, [data], function(err,result){
+		database.mysql.query(sql, [data], function(err,result){
 			next(err, result);
 		});
 	}, function(err){
