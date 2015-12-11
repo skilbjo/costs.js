@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Database credentials
-user="root"
-password=""
-host="localhost"
 db_name="costs"
 
 # Other options
@@ -19,7 +16,7 @@ server_path="/home/skilbjo/code/sql/costsjs/postgres"
 umask 177
 
 # Create backup
-pg_dump $db_name > $backup_path/$db_name-$date.sql
+pg_dump -c -U $username $db_name > $backup_path/$db_name-$date.sql
 
 # Delete old backups
 # find . -name "$backup_path/*.sql" -mtime +45 exec rm {} \;
