@@ -1,4 +1,8 @@
-declare @start as date = '2015-11-01', @end as date = '2015-11-30';
+declare @now date, @start date, @end date
+
+set @now = getdate()
+set @start = dateadd(yy,-1,dateadd(mm,(year(@now)- 1900) * 12 + month(@now) - 1 -1 , 0))
+set @end   = dateadd(d,-1 , dateadd(mm,(year(@now)- 1900) * 12 + month(@now)- 1 , 0))  
 
 if object_id('tempdb..#Mids') is not null drop table #Mids
 select PlatformId, Vertical, ParentAccountId, ParentName, Processor, case when Processor in ('Vantiv') then '4445'+cast(ProcessorMid as varchar) else cast(ProcessorMid as varchar) end as ProcessorMid

@@ -3,7 +3,7 @@ var fs = require('fs'),
 	async = require('async'),
 	h = require('./../lib/helper.js'),
 	psql = require('./../lib/config/database.js'),
-	file = 'QTCSM00Y_MM-085_01-31-2015.txt',
+	file = 'QTCSM00Y_MM-085_12-31-2015.txt',
 	Month = new Date(file.split('_')[2].replace(/.txt/,'')).toISOString().slice(0,10),
 	stream = fs.createReadStream(path.join('./../processor/Vantiv/txt', file)).setEncoding('utf-8'),
 	Merchant_Id = 4445, Merchant_Descriptor = '', large_array = [],
@@ -44,7 +44,7 @@ var isSummaryTable = function(line) {
 };
 
 var merchantFilter = function() {
-	var desiredMerchant = '4445015871111';
+	var desiredMerchant = '4445018560409';
 	if (filter) {
 		return desiredMerchant === Merchant_Id ? false : true;
 	} else {
@@ -73,10 +73,12 @@ rl.on('line', function(line) {
 });
 
 rl.on('close', function() {
-	psql.connect();
-	reduceArray(large_array, function(small_array){
-		db(small_array);
-	});
+	if (imprt) {
+		psql.connect();
+		reduceArray(large_array, function(small_array){
+			db(small_array);
+		});
+	}
 });
 
 var reduceArray = function(arr, cb){
