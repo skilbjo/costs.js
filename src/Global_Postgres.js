@@ -3,10 +3,10 @@ var fs = require('fs'),
 	csv = require('csv'),
 	h = require('./../lib/helper.js'),
 	psql = require('./../lib/config/database.js'),
-	file = 'Presentment_Interchange_Summary_2016-12-31T193513.csv',
+	file = 'Presentment_Interchange_Summary_2015-12-31T193513.csv',
 	Month = file.split('_')[3].replace(/.csv/,'').slice(0,10),
 	stream 	= fs.createReadStream(path.join('./../processor/GlobalPayments/csv',file)),
-	csv_data = [] , large_array = [], data = '', showConsole = false,
+	csv_data = [] , large_array = [], data = '', imprt = true, showConsole = true,
 	table					= 'GlobalPayments'
 	;
 
@@ -21,8 +21,10 @@ stream.on('end', function() {
 	csv.parse(data, {auto_parse: true, trim: true}, function(err, data){
 		csv_data.push(data);
 		transform(csv_data,function(large_array){
-			psql.connect();
-			db(large_array);
+			if (imprt) {
+				psql.connect();
+				db(large_array);
+			}
 		});
 	});
 });
