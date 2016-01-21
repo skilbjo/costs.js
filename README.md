@@ -110,3 +110,6 @@ query
 
 MySQL: `$ mysql.server start`
 Postgres: `$ postgres -D /usr/local/var/postgres --fork`
+Postgres 9.5: `$ postgres -D /usr/local/var/postgres9.5/ &`
+
+
